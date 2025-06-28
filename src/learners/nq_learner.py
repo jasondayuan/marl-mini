@@ -3,6 +3,8 @@ from components.episode_buffer import EpisodeBatch
 from modules.mixers.nmix import Mixer
 from modules.mixers.vdn import VDNMixer
 from modules.mixers.qatten import QattenMixer
+from modules.mixers.hybrid import HybridMixer
+from modules.mixers.gnn import GraphMixer
 from utils.rl_utils import build_td_lambda_targets, build_q_lambda_targets
 import torch as th
 from torch.optim import RMSprop, Adam
@@ -25,6 +27,10 @@ class NQLearner:
             self.mixer = VDNMixer()
         elif args.mixer == "qmix":
             self.mixer = Mixer(args)
+        elif args.mixer == "hybrid":
+            self.mixer = HybridMixer(args)
+        elif args.mixer == "gnn":
+            self.mixer = GraphMixer(args)
         else:
             raise "mixer error"
         self.target_mixer = copy.deepcopy(self.mixer)
