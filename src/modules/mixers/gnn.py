@@ -35,15 +35,15 @@ class GraphMixer(nn.Module):
 
     def forward(self, agent_qs, states):
         bs, t, _ = agent_qs.shape
-        agent_qs = agent_qs.view(bs * t, self.n_agents, 1)
-        states = states.view(bs * t, self.state_dim)
+        agent_qs = agent_qs.reshape(bs * t, self.n_agents, 1)
+        states = states.reshape(bs * t, self.state_dim)
 
         # 1. 节点嵌入
         x = F.relu(self.agent_fc1(agent_qs))      # (bs*t, n_agents, embed)
         x = F.relu(self.agent_fc2(x))             # (bs*t, n_agents, embed)
 
         # 2. 邻接矩阵估计
-        adj = self.adj_fc(states).view(-1, self.n_agents, self.n_agents)
+        adj = self.adj_fc(states).reshape(-1, self.n_agents, self.n_agents)
         mask = 1 - th.eye(self.n_agents).to(agent_qs.device).unsqueeze(0)
         adj = adj * mask  # 去掉自环连接
 
@@ -56,4 +56,4 @@ class GraphMixer(nn.Module):
         bias = self.bias_layer(states)                 # (bs*t, 1)
 
         q_tot = readout + bias
-        return q_tot.view(bs, t, 1)
+        return q_tot.reshape(bs, t, 1)
